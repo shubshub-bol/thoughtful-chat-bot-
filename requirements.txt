@@ -1,11 +1,33 @@
 # LangChain core
 langchain==0.3.27
 langchain-core==0.3.79
-
-# Google GenAI support (compatible versions)
 langchain-google-genai==2.1.12
-google-generativeai>=0.7,<1
 
-# Other dependencies
+# Google Generative AI (fixed version to avoid conflict)
+google-generativeai==0.7.0
+
+# Environment & configuration
 python-dotenv==1.0.1
+
+# Streamlit and dependencies
 streamlit==1.39.0
+altair==5.5.0
+blinker==1.9.0
+cachetools==5.5.2
+click==8.3.0
+numpy==2.3.4
+pandas==2.3.3
+pillow==10.4.0
+protobuf==5.29.5
+pyarrow==21.0.0
+rich==14.2.0
+toml==0.10.2
+gitpython==3.1.45
+pydeck==0.9.1
+tornado==6.5.2
+watchdog==5.0.3
+
+# Rich dependencies
+markdown-it-py==4.0.0
+mdurl==0.1.2
+pygments==2.19.2
