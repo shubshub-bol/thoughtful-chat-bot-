@@ -1,6 +1,11 @@
-
-
+# LangChain core
 langchain==0.3.27
 langchain-core==0.3.79
-streamlit==1.39.0
+
+# Google GenAI support (compatible versions)
+langchain-google-genai>=2.1.12
+google-generativeai>=0.7,<1
+
+# Other dependencies
 python-dotenv==1.0.1
+streamlit==1.39.0
