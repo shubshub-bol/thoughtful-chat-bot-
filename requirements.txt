@@ -1,6 +1,6 @@
-pip>=25.2
+pip>=25.0
 langchain==0.3.27
-langchain-google-genai==2.1.11   # slightly older version to avoid conflict
-google-generativeai==0.8.0       # compatible with langchain-google-genai
+langchain-google-genai==2.0.5
+google-generativeai==0.7.2
 python-dotenv==1.0.1
 streamlit==1.39.0
