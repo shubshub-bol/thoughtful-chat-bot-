@@ -231,14 +231,13 @@ def main():
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
 
-    # --- Unified Chat Input and Response Logic (FIXED LOGIC) ---
+    # --- Handle new user input ---
     if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
-        # Add user message to session state and display it immediately
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user", avatar=USER_AVATAR):
-            st.markdown(prompt)
+        st.rerun()
 
-        # Generate and stream AI response
+    # --- Generate AI response if the last message is from the user ---
+    if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
         with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
             try:
                 history = st.session_state.messages[-10:]
@@ -255,7 +254,7 @@ def main():
                 
                 full_response = st.write_stream(stream_response)
                 
-                # Add the complete AI response to session state for history
+                # Add the complete AI response to session state
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
             except Exception as e:
