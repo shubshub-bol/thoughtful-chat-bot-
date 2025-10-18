@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.schema import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage
 
 # Load environment variables from a .env file at the start
 load_dotenv()
@@ -246,5 +246,6 @@ if __name__ == "__main__":
         st.info("Please create a `.env` file and add your key: `GOOGLE_API_KEY='your-api-key-here'`")
     else:
         main()
+
 
 
