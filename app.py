@@ -39,6 +39,7 @@ def set_gemini_background():
     [data-testid="stAppViewContainer"] {{
         background-color: #111827; /* Dark gray base */
         position: relative;
+        overflow: hidden;
         color: #e0e0e0;
         font-family: 'Poppins', sans-serif; /* Apply Poppins to the whole app */
     }}
@@ -58,11 +59,9 @@ def set_gemini_background():
     }}
     
     /* Ensure content is above the background animation */
-    /* And add padding to the bottom to make space for the chat input */
     [data-testid="stVerticalBlock"] {{
         z-index: 1;
         position: relative;
-        padding-bottom: 100px !important; /* Creates space for the input box */
     }}
     
     /* Hide the default Streamlit header */
@@ -155,7 +154,7 @@ def set_gemini_background():
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 70vh; /* Make it take up more vertical space */
+        height: 80vh; /* Make it take up more vertical space */
     }}
     
     /* --- UPDATED HELLO TEXT STYLE --- */
@@ -178,28 +177,6 @@ def set_gemini_background():
         color: rgba(255, 255, 255, 0.7);
         z-index: 100;
     }}
-
-    /* --- STYLING FOR THE INITIAL TEXT INPUT --- */
-    .initial-input-container {{
-        width: 70%;
-        margin: 0 auto;
-    }}
-
-    .initial-input-container [data-testid="stTextInput"] > div > div > input {{
-        background-color: rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(12px);
-        border-radius: 50px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #e0e0e0;
-        padding: 0.75rem 1.5rem;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }}
-
-    .initial-input-container [data-testid="stTextInput"] > div > div > input:focus {{
-        border-color: rgba(173, 216, 230, 0.7);
-        box-shadow: 0 0 10px rgba(173, 216, 230, 0.3);
-    }}
-
     </style>
     
     <!-- Header Mark HTML -->
@@ -240,29 +217,28 @@ def main():
         st.session_state.messages = []
 
     # --- UI Logic ---
+    # Show the initial centered greeting if there are no messages
     if not st.session_state.messages:
-        # Initial view with centered prompt
-        st.markdown('<div class="initial-view-container"><p class="hello-text">Hello there!</p></div>', unsafe_allow_html=True)
-        st.markdown('<div class="initial-input-container">', unsafe_allow_html=True)
-        prompt = st.text_input("Ask Gemini", key="initial_prompt", label_visibility="collapsed")
-        st.markdown('</div>', unsafe_allow_html=True)
-        if prompt:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.rerun()
-    else:
-        # Main chat view
-        for message in st.session_state.messages:
-            avatar = USER_AVATAR if message["role"] == "user" else ASSISTANT_AVATAR
-            with st.chat_message(message["role"], avatar=avatar):
-                st.markdown(message["content"])
-        
-        # Subsequent chat input at the bottom
-        if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.rerun()
+        st.markdown("""
+            <div class="initial-view-container">
+                <p class="hello-text">Hello there!</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    # Display the entire chat history from session state
+    for message in st.session_state.messages:
+        avatar = USER_AVATAR if message["role"] == "user" else ASSISTANT_AVATAR
+        with st.chat_message(message["role"], avatar=avatar):
+            st.markdown(message["content"])
 
-    # --- Generate AI response if the last message is from the user ---
-    if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
+    # --- Unified Chat Input and Response Logic ---
+    if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
+        # Add user message to session state and display it immediately
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user", avatar=USER_AVATAR):
+            st.markdown(prompt)
+
+        # Generate and stream AI response
         with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
             try:
                 history = st.session_state.messages[-10:]
@@ -279,7 +255,7 @@ def main():
                 
                 full_response = st.write_stream(stream_response)
                 
-                # Add the complete AI response to session state
+                # Add the complete AI response to session state for history
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
             except Exception as e:
