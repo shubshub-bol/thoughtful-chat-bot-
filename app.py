@@ -180,7 +180,9 @@ def main():
 
     # Initialize model
     try:
-        model = ChatGoogleGenerativeAI(model='models/gemini-1.5-flash', stream=True)
+        # Correct the model name and parameter for streaming
+        model = ChatGoogleGenerativeAI(model="gemini-flash-latest", streaming=True)
+        
     except Exception as e:
         st.error(f"Failed to initialize Gemini model: {e}")
         return
@@ -237,4 +239,5 @@ if __name__ == "__main__":
         st.error("GOOGLE_API_KEY environment variable not found.")
     else:
         main()
+
 
