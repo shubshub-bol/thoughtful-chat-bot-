@@ -19,15 +19,8 @@ def set_ui_styles(is_initial_state):
     # LinkedIn logo SVG from Bootstrap Icons (MIT License)
     # Source: https://icons.getbootstrap.com/icons/linkedin/
     linkedin_svg_path = """
-    M0 1.146C0.513.526 0 1.175 0h13.65C15.474 0 16.513 16 1.146v13.708c0.633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.518-.681 1.518-1.518S4.58 3.65 3.743 3.65s-1.518.68-1.518 1.518.681 1.518 1.518 1.518zm1.2 8.212h3.553V9.25c0-.926.016-2.116 1.29-2.116 1.291 0 1.488 1.003 1.488 2.049v4.468h3.554V9.019c0-3.22-1.714-5.025-4.287-5.025-2.049 0-3.134 1.084-3.658 2.115h.055V6.169H4.943z
+    M0 1.146C0.513.526 0 1.175 0h13.65C15.474 0 16.513 16 1.146v13.708c0.633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zM4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.518-.681 1.518-1.518S4.58 3.65 3.743 3.65s-1.518.68-1.518 1.518.681 1.518 1.518 1.518zm1.2 8.212h3.553V9.25c0-.926.016-2.116 1.29-2.116 1.291 0 1.488 1.003 1.488 2.049v4.468h3.554V9.019c0-3.22-1.714-5.025-4.287-5.025-2.049 0-3.134 1.084-3.658 2.115h.055V6.169H4.943z
     """
-    # To prevent issues with CSS parsing, it's safer to encode the SVG for use in an anchor tag
-    # However, for direct embedding in HTML, it's fine. Here we will use a data URI for robustness in CSS if needed,
-    # but for the HTML part, we'll embed it directly.
-    
-    # Base64 encode the SVG to create a data URI for the logo
-    # This makes the app self-contained and avoids extra file requests.
-    encoded_svg = base64.b64encode(linkedin_svg_path.encode("utf-8")).decode("utf-8")
     
     # Conditional CSS for the chat input position
     # If it's the initial state, we center the input box. Otherwise, it stays at the bottom.
@@ -93,7 +86,7 @@ def set_ui_styles(is_initial_state):
     }}
     
     /* Ensure content is above the background animation */
-   ,.main {{
+   .main {{
         z-index: 1;
         position: relative;
     }}
@@ -270,7 +263,7 @@ def main():
 
     # --- Session State Initialization ---
     if "messages" not in st.session_state:
-        st.session_state.messages =
+        st.session_state.messages = # <<< THIS LINE IS NOW CORRECTED
 
     # --- UI Styling ---
     # The key change: pass the state to the styling function
