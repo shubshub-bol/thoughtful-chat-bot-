@@ -3,6 +3,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
+import time
 
 # Load environment variables from a .env file at the start
 load_dotenv()
@@ -33,108 +34,68 @@ def set_gemini_background():
     }}
     
     @keyframes fadeIn {{
-        from {{
-            opacity: 0;
-            transform: translateY(15px);
-        }}
-        to {{
-            opacity: 1;
-            transform: translateY(0);
-        }}
+        from {{ opacity: 0; transform: translateY(15px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
     }}
 
     /* Main app container styling */
     [data-testid="stAppViewContainer"] {{
-        background-color: #111827; /* Dark gray base */
+        background-color: #111827;
         position: relative;
+        overflow: hidden; /* Keep hidden for blob animation */
         color: #e0e0e0;
         font-family: 'Poppins', sans-serif;
-        /* CRITICAL FIX: Ensure the container itself doesn't hide overflow */
-        overflow: hidden; 
     }}
 
     /* Pseudo-element for the animated blob */
     [data-testid="stAppViewContainer"]::before {{
         content: '';
         position: absolute;
-        top: 20%;
-        left: 25%;
-        width: 50%;
-        height: 60%;
+        top: 20%; left: 25%;
+        width: 50%; height: 60%;
         background: linear-gradient(135deg, rgba(76, 0, 255, 0.5), rgba(0, 191, 255, 0.5));
         animation: morph 15s ease-in-out infinite;
         filter: blur(80px);
         z-index: 0;
     }}
     
-    /* Ensure all content is above the background animation */
-    /* Use a class for the main layout to avoid affecting other elements */
-    .main-content-wrapper {{
-        position: relative;
+    /* Make all content relative to stay on top of the background */
+    .stApp > div {{
         z-index: 1;
-        display: flex;
-        flex-direction: column;
-        height: 100vh; /* Make the wrapper take full viewport height */
+        position: relative;
     }}
     
     /* Hide the default Streamlit header */
     [data-testid="stHeader"] {{
         background-color: rgba(0, 0, 0, 0);
-        z-index: 101; /* Ensure header is above content */
+        z-index: 101;
     }}
 
-    /* --- CHAT AREA SCROLLING FIX --- */
-    /* Target the container that holds the chat messages */
-    .st-emotion-cache-1jicfl2 {{
-        flex-grow: 1; /* Allow this container to grow and fill available space */
-        overflow-y: auto; /* Enable vertical scrolling for the chat area */
-        padding-bottom: 20px; /* Add some space at the bottom */
-    }}
-
-    /* Custom scrollbar for a cleaner look */
-    .st-emotion-cache-1jicfl2::-webkit-scrollbar {{
-        width: 6px;
-    }}
-    .st-emotion-cache-1jicfl2::-webkit-scrollbar-track {{
-        background: rgba(0,0,0,0.1);
-        border-radius: 10px;
-    }}
-    .st-emotion-cache-1jicfl2::-webkit-scrollbar-thumb {{
-        background: rgba(255,255,255,0.2);
-        border-radius: 10px;
-    }}
-    .st-emotion-cache-1jicfl2::-webkit-scrollbar-thumb:hover {{
-        background: rgba(255,255,255,0.3);
-    }}
-
-    /* --- CHAT INPUT STYLES --- */
-    /* This section remains largely the same, but it will now be correctly positioned at the bottom */
+    /* --- CHAT INPUT STICKY FIX --- */
+    /* This ensures the input bar is always at the bottom */
     section[data-testid="stBottom"] {{
         background-color: transparent !important;
         border: none !important;
-        padding: 0 1rem 1rem 1rem; /* Adjust padding */
-        z-index: 2; /* Keep input on top */
+        padding: 0 1rem 1rem 1rem;
+        z-index: 2;
     }}
 
     /* Style the pill-shaped chat input box */
     [data-testid="stChatInput"] {{
         background-color: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(12px);
-        border-radius: 50px; /* Pill shape */
+        border-radius: 50px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }}
-
     [data-testid="stChatInput"]:focus-within {{
         border-color: rgba(173, 216, 230, 0.7);
         box-shadow: 0 0 10px rgba(173, 216, 230, 0.3);
     }}
-    
     [data-testid="stChatInput"] textarea::placeholder {{
         color: rgba(255, 255, 255, 0.6);
         font-family: 'Poppins', sans-serif;
     }}
-    
     [data-testid="stChatInput"] button {{
         background-color: #333; border: none; border-radius: 50%;
         width: 36px; height: 36px; display: flex;
@@ -163,10 +124,11 @@ def set_gemini_background():
     .initial-view-container {{
         display: flex;
         flex-direction: column;
-        justify-content: center; /* Center vertically in its container */
+        justify-content: center;
         align-items: center;
-        flex-grow: 1; /* Allow it to take up all available space */
         text-align: center;
+        /* Use viewport height minus an approximation for the input bar */
+        height: calc(100vh - 100px);
     }}
     
     .hello-text {{
@@ -181,35 +143,24 @@ def set_gemini_background():
     /* --- HEADER MARK WITH CLICKABLE LOGO --- */
     .header-mark {{
         position: fixed;
-        top: 25px;
-        left: 30px;
-        display: flex;
-        align-items: center;
-        gap: 10px; /* Space between name and icon */
-        font-size: 0.9em;
-        font-weight: 400;
+        top: 25px; left: 30px;
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.9em; font-weight: 400;
         color: rgba(255, 255, 255, 0.7);
         z-index: 100;
     }}
     .header-mark a {{
-        display: inline-block;
-        line-height: 0; /* Align icon properly */
+        display: inline-block; line-height: 0;
         transition: transform 0.2s ease-in-out;
     }}
-    .header-mark a:hover {{
-        transform: scale(1.1);
-    }}
+    .header-mark a:hover {{ transform: scale(1.1); }}
     .linkedin-icon {{
-        width: 20px;
-        height: 20px;
+        width: 20px; height: 20px;
         color: rgba(255, 255, 255, 0.7);
     }}
-    .linkedin-icon:hover {{
-        color: rgba(255, 255, 255, 1.0);
-    }}
+    .linkedin-icon:hover {{ color: rgba(255, 255, 255, 1.0); }}
     </style>
     
-    <!-- Header Mark HTML with clickable link -->
     <div class="header-mark">
         <span>Developed by Shubham Yadav</span>
         <a href="https://www.linkedin.com/in/shubham-yadav-ds/" target="_blank" rel="noopener noreferrer">
@@ -223,92 +174,76 @@ def main():
     """
     This function runs the Streamlit chatbot application.
     """
-    # --- Page Configuration ---
-    st.set_page_config(
-        page_title="Gemini Chatbot",
-        page_icon="✨",
-        layout="centered"
-    )
-
+    st.set_page_config(page_title="Gemini Chatbot", page_icon="✨", layout="centered")
     set_gemini_background()
 
-    # --- AVATAR ICONS ---
-    USER_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2YwZjBmMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0yMzAuOTIsMjEyYy0xNS4yMy0yNi4zMy0zOC43LTQ1LjIxLTY2LjA5LTU0LjE2YTcyLDcyLDAsMSwwLTczLjY2LDBDNjMuNzgsMTY2Ljc4LDQwLjMxLDE4NS42NiwyNS4wOCwyMTJhOCw4LDAsMSwwLDEzLjg0LDhjMTguODQtMzIuNTYsNTIuMTQtNTIsODkuMDgtNTJzNzAuMjQsMTkuNDQsODkuMDgsNTJhOCw4LDAsMSwwLDEzLjg0LThaIj48L3BhdGg+PC9zdmc+"
-    ASSISTANT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2YwZjBmMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0yMDgsMzJINDhBMTYsMTYsMCwwLDAsMzIsNDhWMTc2YTE2LDE2LDAsMCwwLDE2LDE2SDY0djI0YTgsOCwwLDAsMCwxNiwwVjE5Mmg5NnYyNGE4LDgsMCwwLDAsMTYsMFYxOTJoMTZhMTYsMTYsMCwwLDAsMTYtMTZWNDhBMTYsMTYsMCwwLDAsMjA4LDMyWk05NiwxNDRhMTYsMTYsMCwxLDEsMTYtMTZBMTYsMTYsMCwwLDEsOTYsMTQ0Wm02NCwwYTE2LDE2LDAsMSwxLDE2LTE2QTE2LDE2LDAsMCwxLDE2MCwxNDRaIj48L3BhdGg+PC9zdmc+"
+    USER_AVATAR = "https://i.ibb.co/Xz6C7V6/user-avatar.png"
+    ASSISTANT_AVATAR = "https://i.ibb.co/1npG22W/gemini-avatar.png"
 
-    # --- Model Initialization ---
     try:
         model = ChatGoogleGenerativeAI(model='models/gemini-1.5-flash', stream=True)
     except Exception as e:
-        st.error(f"Failed to initialize the Gemini model. Please check your API key.")
+        st.error("Failed to initialize the Gemini model. Please check your API key.")
         st.error(f"Error details: {e}")
         return
 
-    # --- Session State for Chat History ---
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # --- UI LAYOUT ---
-    # Apply a wrapper div to control the main layout with flexbox
-    st.markdown('<div class="main-content-wrapper">', unsafe_allow_html=True)
+    # Display initial message if the chat is empty
+    if not st.session_state.messages:
+        st.markdown("""
+            <div class="initial-view-container">
+                <p class="hello-text">Hello there!</p>
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Display the entire chat history
+        for message in st.session_state.messages:
+            avatar = USER_AVATAR if message["role"] == "user" else ASSISTANT_AVATAR
+            with st.chat_message(message["role"], avatar=avatar):
+                st.markdown(message["content"])
 
-    # Use a container for the chat history to enable scrolling
-    chat_container = st.container()
-
-    with chat_container:
-        # Show the initial centered greeting if there are no messages
-        if not st.session_state.messages:
-            st.markdown("""
-                <div class="initial-view-container">
-                    <p class="hello-text">Hello there!</p>
-                </div>
-            """, unsafe_allow_html=True)
-        else:
-            # Display the entire chat history from session state
-            for message in st.session_state.messages:
-                avatar = USER_AVATAR if message["role"] == "user" else ASSISTANT_AVATAR
-                with st.chat_message(message["role"], avatar=avatar):
-                    st.markdown(message["content"])
-
-    # --- UNIFIED CHAT INPUT AND RESPONSE LOGIC ---
+    # Main chat input and response logic
     if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
-        # Add user message to session state and display it
+        # Add user message to state and display it immediately
         st.session_state.messages.append({"role": "user", "content": prompt})
         
-        # Display the new user message inside the chat container
-        with chat_container:
-            with st.chat_message("user", avatar=USER_AVATAR):
-                st.markdown(prompt)
+        # Display the user's message
+        with st.chat_message("user", avatar=USER_AVATAR):
+            st.markdown(prompt)
 
         # Generate and stream AI response
-        with chat_container:
-            with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
-                try:
-                    history = st.session_state.messages[-10:]
-                    langchain_messages = [
-                        HumanMessage(content=msg["content"]) if msg["role"] == "user" 
-                        else AIMessage(content=msg["content"]) 
-                        for msg in history
-                    ]
-                    config = {"generation_config": {"response_mime_type": "text/plain"}}
-                    
-                    def stream_response():
-                        for chunk in model.stream(langchain_messages, config=config):
-                            yield chunk.content
-                    
-                    full_response = st.write_stream(stream_response)
-                    
-                    # Add the complete AI response to session state for history
-                    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
+            try:
+                # Prepare history for the model
+                history = st.session_state.messages[-10:]
+                langchain_messages = [
+                    HumanMessage(content=msg["content"]) if msg["role"] == "user"
+                    else AIMessage(content=msg["content"])
+                    for msg in history
+                ]
+                config = {"generation_config": {"response_mime_type": "text/plain"}}
 
-                except Exception as e:
-                    st.error(f"An error occurred while getting the response: {e}")
-        
-        # Rerun to clear the "Hello there!" and display the full chat
-        st.rerun()
+                # Define the streaming function
+                def stream_response():
+                    for chunk in model.stream(langchain_messages, config=config):
+                        yield chunk.content
+                
+                # Use write_stream to display the response and capture the full text
+                full_response = st.write_stream(stream_response)
+                
+                # Add the complete AI response to session state for history
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                
+                # A small delay and rerun can help ensure the layout updates correctly
+                # after the first message is sent, transitioning from the initial view.
+                if len(st.session_state.messages) == 2: # Only rerun after the very first exchange
+                    time.sleep(0.1)
+                    st.rerun()
 
-    # Close the wrapper div
-    st.markdown('</div>', unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"An error occurred while getting the response: {e}")
 
 if __name__ == "__main__":
     if os.getenv("GOOGLE_API_KEY") is None:
@@ -316,3 +251,4 @@ if __name__ == "__main__":
         st.info("Please create a `.env` file and add your key: `GOOGLE_API_KEY='your-api-key-here'`")
     else:
         main()
+
