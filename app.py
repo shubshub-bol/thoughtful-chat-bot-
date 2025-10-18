@@ -69,7 +69,7 @@ def set_gemini_background():
         background-color: rgba(0, 0, 0, 0);
     }}
 
-    /* --- FIX TO LIFT SEARCH BOX --- */
+    /* --- DEFINITIVE FIX FOR BLACK BAR & POSITIONING --- */
     div[data-testid="stBottom"] {{
         background-color: transparent !important;
         border: none !important;
