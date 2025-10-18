@@ -49,6 +49,13 @@ def set_gemini_background():
         filter: blur(80px);
         z-index: 0;
     }}
+
+    [data-testid="stAppViewContainer"] > div:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* stick chat at bottom */
+    min-height: 100vh;
+}
     
     .stApp {{
         position: relative;
@@ -67,7 +74,7 @@ def set_gemini_background():
     }}
 
     [data-testid="stChatInput"] {{
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: rgba(0,0,0,0.0);
         backdrop-filter: blur(12px);
         border-radius: 50px;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -89,7 +96,7 @@ def set_gemini_background():
     [data-testid="stChatInput"] button::after {{ content: '➤'; font-size: 18px; color: white; }}
     
     [data-testid="stChatMessage"] {{
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(255,255,255,0.05);
         backdrop-filter: blur(10px);
         border-radius: 12px;
         padding: 16px;
@@ -209,3 +216,4 @@ if __name__ == "__main__":
         st.error("GOOGLE_API_KEY environment variable not found.")
     else:
         main()
+
