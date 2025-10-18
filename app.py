@@ -14,6 +14,11 @@ def set_gemini_background():
     """
     Sets a "liquid glass" themed animated background and UI styles for the Streamlit app.
     """
+    # Icons encoded in Base64
+    linkedin_icon_base64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2YwZjBmMCIgdmlld0JveD0iMCAwIDE2IDE2Ij48cGF0aCBkPSJNMCAxLjE0NkMwIC41MTMuNTI2IDAgMS4xNzUgMGgxMy42NUMxNS40NzQgMCAxNiAuNTEzIDE2IDEuMTQ2djEzLjcwOGMwIC42MzMtLjUyNiAxLjE0Ni0xLjE3NSAxLjE0NkgxLjE3NUMuNTI2IDE2IDAgMTUuNDg3IDAgMTQuODU0em00Ljk0MyAxMi4yNDhWNi4xNjloLTIuNTQydjcuMjI1em0tMS4yLTguMjEyYy44MzcgMCAxLjM1OC0uNTU0IDEuMzU4LTEuMjQ4LS4wMTUtLjcwOS0uNTItMS4yNDgtMS4zNDItMS4yNDhTMi40IDMuMjI2IDIuNCAzLjkzNGMwIC42OTQuNTIxIDEuMjQ4IDEuMzI3IDEuMjQ4em00LjkwOCA4LjIxMlY5LjM1OSMwLS4yMTYuMDE2LS40MzIuMDgtLjU4Ni4xNzMtLjQzMS41NjgtLjg3OCAxLjIzMi0uODc4Ljg2OSAwIDEuMjE2LjY2MiAxLjIxNiAxLjYzNHYzLjg2NWgyLjQwMVY5LjI1Yy0yLjIyLTEuMTg0LTMuMjUyLTIuNzY0LTMuMjUyLTEuMjc0IDAtMS44NDUuNy0yLjE2NSAxLjE5M3YuMDI1aC0uMDE2YTUuNTQgNS41NCAwIDAgMSAuMDE2LS4wMjVWNi4xNjloLTIuNGMuMDMuNjc4IDAgNy4yMjUgMCA3LjIyNXoiLz48L3N2Zz4="
+    github_icon_base64 = "PHN2ZyByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjZjBmMGYwIj48dGl0bGU+R2l0SHViPC90aXRsZT48cGF0aCBkPSJNMTIgLjI5N2MtNi42MyAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDMgMy40MzggOS44IDguMjA1IDExLjM4NS42LjExMy44Mi0uMjU4LjgyLS41NzcgMC0uMjg1LS4wMS0xLjA0LS4wMTUtMi4wNC0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOSAxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzYgMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OTguMTA4LS43NzYuNDE3LTEuMzA1Ljc2LTEuNjA1LTIuNjY1LS4zLTUuNDY2LTEuMzMyLTUuNDY2LTUuOTMgMC0xLjMxLjQ2NS0yLjM4IDEuMjM1LTMuMjItLjEzNS0uMzAzLS41NC0xLjUyMy4xMDUtMy4xNzYgMCAwIDEuMDA1LS4zMjIgMy4zIDEuMjMuOTYtLjI2NyAxLjk4LS4zOTkgMy0uNDA1IDEuMDIuMDA2IDIuMDQuMTM4IDMgLjQwNSAyLjI4LTEuNTUyIDMuMjg1LTEuMjMgMy4yODUtMS4yMy42NDUgMS42NTMuMjQgMi44NzMuMTIgMy4xNzYuNzY1Ljg0IDEuMjMgMS45MSAxLjIzIDMuMjIgMCA0LjYxLTIuODA1IDUuNjI1LTUuNDc1IDUuOTIuNDIuMzYuODEgMS4wOTYuODEgMi4yMiAwIDEuNjA2LS4wMTUgMi44OTYtLjAxNSAzLjI4NiAwIC4zMTUuMjEuNjkuODI1LjU3QzIwLjU2NSAyMi4wOTIgMjQgMTcuNTkyIDI0IDEyLjI5N2MwLTYuNjI3LTUuMzczLTEyLTEyLTEyIi8+PC9zdmc+"
+
+
     page_bg_img = f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -69,9 +74,15 @@ def set_gemini_background():
         background-color: rgba(0, 0, 0, 0);
     }}
 
-    /* --- NEW STRATEGY TO REMOVE BLACK BAR --- */
+    /* --- DEFINITIVE FIX FOR BLACK BAR & POSITIONING --- */
     section[data-testid="stBottom"] {{
         background-color: transparent !important;
+        border: none !important;
+        padding-bottom: 20px !important; /* Lifts the whole bottom section */
+    }}
+    section[data-testid="stBottom"] > div {{
+        background-color: transparent !important;
+        border: none !important;
     }}
     /* --- END FIX --- */
 
@@ -84,7 +95,6 @@ def set_gemini_background():
         border-radius: 50px; /* Pill shape */
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        margin-bottom: 20px; /* Lifts the input box from the bottom */
     }}
 
     /* Add a glow effect when the chat input is focused */
