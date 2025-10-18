@@ -14,41 +14,38 @@ def set_gemini_background():
     """
     Sets a "liquid glass" themed animated background and UI styles for the Streamlit app.
     """
-    # Icon encoded in Base64
-    linkedin_icon_base64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2YwZjBmMCIgdmlld0JveD0iMCAwIDE2IDE2Ij48cGF0aCBkPSJNMCAxLjE0NkMwIC41MTMuNTI2IDAgMS4xNzUgMGgxMy42NUMxNS40NzQgMCAxNiAuNTEzIDE2IDEuMTQ2djEzLjcwOGMwIC42MzMtLjUyNiAxLjE0Ni0xLjE3NSAxLjE0NkgxLjE3NUMuNTI2IDE2IDAgMTUuNDg3IDAgMTQuODU0em00Ljk0MyAxMi4yNDhWNi4xNjloLTIuNTQydjcuMjI1em0tMS4yLTguMjEyYy44MzcgMCAxLjM1OC0uNTU0IDEuMzU4LTEuMjQ4LS4wMTUtLjcwOS0uNTItMS4yNDgtMS4zNDItMS4yNDhTMi40IDMuMjI2IDIuNCAzLjkzNGMwIC42OTQuNTIxIDEuMjQ4IDEuMzI3IDEuMjQ4em00LjkwOCA4LjIxMlY5LjM1OSMwLS4yMTYuMDE2LS40MzIuMDgtLjU4Ni4xNzMtLjQzMS41NjgtLjg3OCAxLjIzMi0uODc4Ljg2OSAwIDEuMjE2LjY2MiAxLjIxNiAxLjYzNHYzLjg2NWgyLjQwMVY5LjI1Yy0yLjIyLTEuMTg0LTMuMjUyLTIuNzY0LTMuMjUyLTEuMjc0IDAtMS44NDUuNy0yLjE2NSAxLjE5M3YuMDI1aC0uMDE2YTUuNTQgNS41NCAwIDAgMSAuMDE2LS4wMjVWNi4xNjloLTIuNGMuMDMuNjc4IDAgNy4yMjUgMCA3LjIyNXoiLz48L3N2Zz4="
-
-    page_bg_img = f"""
+    page_bg_img = """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-    @keyframes morph {{
-        0% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1.2); }}
-        50% {{ border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.1); }}
-        100% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1.2); }}
-    }}
+    @keyframes morph {
+        0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1.2); }
+        50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.1); }
+        100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1.2); }
+    }
     
-    @keyframes fadeIn {{
-        from {{
+    @keyframes fadeIn {
+        from {
             opacity: 0;
             transform: translateY(15px);
-        }}
-        to {{
+        }
+        to {
             opacity: 1;
             transform: translateY(0);
-        }}
-    }}
+        }
+    }
 
     /* Main app container styling */
-    [data-testid="stAppViewContainer"] {{
+    [data-testid="stAppViewContainer"] {
         background-color: #111827; /* Dark gray base */
         position: relative;
         overflow: hidden;
         color: #e0e0e0;
         font-family: 'Poppins', sans-serif; /* Apply Poppins to the whole app */
-    }}
+    }
 
     /* Pseudo-element for the animated blob */
-    [data-testid="stAppViewContainer"]::before {{
+    [data-testid="stAppViewContainer"]::before {
         content: '';
         position: absolute;
         top: 20%;
@@ -59,57 +56,49 @@ def set_gemini_background():
         animation: morph 15s ease-in-out infinite;
         filter: blur(80px); /* Increased blur for a softer look */
         z-index: 0;
-    }}
+    }
     
     /* Ensure content is above the background animation */
-    [data-testid="stVerticalBlock"] {{
+    [data-testid="stVerticalBlock"] {
         z-index: 1;
         position: relative;
-    }}
+    }
     
     /* Hide the default Streamlit header */
-    [data-testid="stHeader"] {{
+    [data-testid="stHeader"] {
         background-color: rgba(0, 0, 0, 0);
-    }}
+    }
 
-    /* --- DEFINITIVE FIX FOR BLACK BAR & CLICKABLE LOGOS --- */
-    div[data-testid="stBottom"] {{
-        background-color: transparent !important;
-        pointer-events: none !important;
-        border: none !important;
-        padding-bottom: 20px !important; /* Lifts the input box */
-    }}
-
-    div[data-testid="stChatInput"], .header-mark {{
-        pointer-events: auto !important;
-    }}
-    /* --- END FIX --- */
+    /* --- MORE AGGRESSIVE FIX for the black bar --- */
+    div[data-testid="stBottom"] > div {
+        background: transparent;
+    }
 
     /* --- INPUT STYLES START --- */
     
     /* Style the main chat input box (at the bottom) */
-    [data-testid="stChatInput"] {{
+    [data-testid="stChatInput"] {
         background-color: rgba(0, 0, 0, 0.2); /* More transparent */
         backdrop-filter: blur(12px);
         border-radius: 50px; /* Pill shape */
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }}
+    }
 
     /* Add a glow effect when the chat input is focused */
-    [data-testid="stChatInput"]:focus-within {{
+    [data-testid="stChatInput"]:focus-within {
         border-color: rgba(173, 216, 230, 0.7); /* Light blue glow */
         box-shadow: 0 0 10px rgba(173, 216, 230, 0.3);
-    }}
+    }
     
     /* Styling for the placeholder text in the main chat input */
-    [data-testid="stChatInput"] textarea::placeholder {{
+    [data-testid="stChatInput"] textarea::placeholder {
         color: rgba(255, 255, 255, 0.6);
         font-family: 'Poppins', sans-serif;
-    }}
+    }
 
     /* --- NEW SEND BUTTON STYLES --- */
-    [data-testid="stChatInput"] button {{
+    [data-testid="stChatInput"] button {
         background-color: #333;
         border: none;
         border-radius: 50%;
@@ -120,29 +109,29 @@ def set_gemini_background():
         align-items: center;
         transition: background-color 0.3s ease;
         margin: 5px;
-    }}
+    }
 
-    [data-testid="stChatInput"] button:hover {{
+    [data-testid="stChatInput"] button:hover {
         background-color: #444;
-    }}
+    }
 
-    [data-testid="stChatInput"] button svg {{
+    [data-testid="stChatInput"] button svg {
         display: none; /* Hide default SVG */
-    }}
+    }
 
-    [data-testid="stChatInput"] button::after {{
+    [data-testid="stChatInput"] button::after {
         content: '➤';
         font-size: 18px;
         color: white;
         transform: rotate(0deg);
         line-height: 1;
-    }}
+    }
     
     /* --- INPUT STYLES END --- */
 
 
     /* Style the chat messages with animation */
-    [data-testid="stChatMessage"] {{
+    [data-testid="stChatMessage"] {
         background-color: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(10px);
         border-radius: 12px;
@@ -150,57 +139,28 @@ def set_gemini_background():
         border: 1px solid rgba(255, 255, 255, 0.05);
         animation: fadeIn 0.5s ease-out; /* Apply the fade-in animation */
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
-    }}
+    }
 
     /* Centered container for the initial 'Hello' message */
-    .initial-view-container {{
+    .initial-view-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 80vh; /* Make it take up more vertical space */
-    }}
+    }
     
     /* --- UPDATED HELLO TEXT STYLE --- */
-    .hello-text {{
+    .hello-text {
         font-family: 'Poppins', sans-serif !important;
         font-size: 4.0em !important; /* Reduced size */
         font-weight: 600 !important; /* Bolder */
         color: #f0f0f0 !important;
         padding-bottom: 20px !important;
         letter-spacing: -2px !important; /* Tighter spacing */
-    }}
+    }
     
-    /* --- HEADER MARK STYLE --- */
-    .header-mark {{
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 1em;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.8);
-        z-index: 100;
-    }}
-    .header-mark a img {{
-        width: 20px;
-        height: 20px;
-        transition: opacity 0.3s ease;
-    }}
-    .header-mark a:hover img {{
-        opacity: 0.8;
-    }}
     </style>
-    
-    <!-- Header Mark HTML -->
-    <div class="header-mark">
-        <span>Shubham</span>
-        <a href="https://www.linkedin.com/in/shubham-yadav-ds/" target="_blank">
-            <img src="data:image/svg+xml;base64,{linkedin_icon_base64}" alt="LinkedIn">
-        </a>
-    </div>
     """
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
@@ -250,7 +210,7 @@ def main():
             st.markdown(message["content"])
 
     # --- Unified Chat Input and Response Logic ---
-    if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
+    if prompt := st.chat_input("Ask Gemini"):
         # Add user message to session state and display it immediately
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user", avatar=USER_AVATAR):
