@@ -39,7 +39,7 @@ def set_gemini_background():
     [data-testid="stAppViewContainer"] {{
         background-color: #111827; /* Dark gray base */
         position: relative;
-        overflow: hidden;
+        /* overflow: hidden;  <-- THIS WAS THE BUG. REMOVED. */
         color: #e0e0e0;
         font-family: 'Poppins', sans-serif; /* Apply Poppins to the whole app */
     }}
@@ -59,9 +59,11 @@ def set_gemini_background():
     }}
     
     /* Ensure content is above the background animation */
+    /* And add padding to the bottom to make space for the chat input */
     [data-testid="stVerticalBlock"] {{
         z-index: 1;
         position: relative;
+        padding-bottom: 100px !important; /* Creates space for the input box */
     }}
     
     /* Hide the default Streamlit header */
