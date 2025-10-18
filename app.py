@@ -71,9 +71,12 @@ def set_gemini_background():
 
     /* --- DEFINITIVE FIX FOR BLACK BAR & POSITIONING --- */
     div[data-testid="stBottom"] {{
-        background-color: transparent !important;
-        border: none !important;
         padding-bottom: 20px !important; /* Lifts the input box */
+        background-color: transparent !important;
+    }}
+    /* This targets the inner container that holds the chat input */
+    .st-emotion-cache-1jicfl2 {{
+        background-color: transparent !important;
     }}
     /* --- END FIX --- */
 
