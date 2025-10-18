@@ -50,12 +50,12 @@ def set_gemini_background():
         z-index: 0;
     }}
 
-    [data-testid="stAppViewContainer"] > div:first-child {
+    [data-testid="stAppViewContainer"] > div:first-child {{
     display: flex;
     flex-direction: column;
     justify-content: flex-end; /* stick chat at bottom */
     min-height: 100vh;
-}
+}}
     
     .stApp {{
         position: relative;
@@ -216,4 +216,5 @@ if __name__ == "__main__":
         st.error("GOOGLE_API_KEY environment variable not found.")
     else:
         main()
+
 
