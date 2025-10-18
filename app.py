@@ -69,13 +69,8 @@ def set_gemini_background():
         background-color: rgba(0, 0, 0, 0);
     }}
 
-    /* --- DEFINITIVE FIX FOR BLACK BAR & POSITIONING --- */
-    div[data-testid="stBottom"] {{
-        padding-bottom: 20px !important; /* Lifts the input box */
-        background-color: transparent !important;
-    }}
-    /* This targets the inner container that holds the chat input */
-    .st-emotion-cache-1jicfl2 {{
+    /* --- NEW STRATEGY TO REMOVE BLACK BAR --- */
+    section[data-testid="stBottom"] {{
         background-color: transparent !important;
     }}
     /* --- END FIX --- */
@@ -89,6 +84,7 @@ def set_gemini_background():
         border-radius: 50px; /* Pill shape */
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px; /* Lifts the input box from the bottom */
     }}
 
     /* Add a glow effect when the chat input is focused */
