@@ -69,16 +69,11 @@ def set_gemini_background():
         background-color: rgba(0, 0, 0, 0);
     }}
 
-    /* --- DEFINITIVE FIX FOR BLACK BAR & CLICKABLE LOGOS --- */
+    /* --- DEFINITIVE FIX FOR BLACK BAR --- */
     div[data-testid="stBottom"] {{
         background-color: transparent !important;
-        pointer-events: none !important;
         border: none !important;
         padding-bottom: 20px !important; /* Lifts the input box */
-    }}
-
-    div[data-testid="stChatInput"] {{
-        pointer-events: auto !important;
     }}
     /* --- END FIX --- */
 
