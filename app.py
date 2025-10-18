@@ -14,38 +14,38 @@ def set_gemini_background():
     """
     Sets a "liquid glass" themed animated background and UI styles for the Streamlit app.
     """
-    page_bg_img = f"""
+    page_bg_img = """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-    @keyframes morph {{
-        0% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1.2); }}
-        50% {{ border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.1); }}
-        100% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1.2); }}
-    }}
+    @keyframes morph {
+        0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1.2); }
+        50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.1); }
+        100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1.2); }
+    }
     
-    @keyframes fadeIn {{
-        from {{
+    @keyframes fadeIn {
+        from {
             opacity: 0;
             transform: translateY(15px);
-        }}
-        to {{
+        }
+        to {
             opacity: 1;
             transform: translateY(0);
-        }}
-    }}
+        }
+    }
 
     /* Main app container styling */
-    [data-testid="stAppViewContainer"] {{
+    [data-testid="stAppViewContainer"] {
         background-color: #111827; /* Dark gray base */
         position: relative;
         overflow: hidden;
         color: #e0e0e0;
         font-family: 'Poppins', sans-serif; /* Apply Poppins to the whole app */
-    }}
+    }
 
     /* Pseudo-element for the animated blob */
-    [data-testid="stAppViewContainer"]::before {{
+    [data-testid="stAppViewContainer"]::before {
         content: '';
         position: absolute;
         top: 20%;
@@ -56,52 +56,49 @@ def set_gemini_background():
         animation: morph 15s ease-in-out infinite;
         filter: blur(80px); /* Increased blur for a softer look */
         z-index: 0;
-    }}
+    }
     
     /* Ensure content is above the background animation */
-    [data-testid="stVerticalBlock"] {{
+    [data-testid="stVerticalBlock"] {
         z-index: 1;
         position: relative;
-    }}
+    }
     
     /* Hide the default Streamlit header */
-    [data-testid="stHeader"] {{
+    [data-testid="stHeader"] {
         background-color: rgba(0, 0, 0, 0);
-    }}
+    }
 
-    /* --- DEFINITIVE FIX FOR BLACK BAR --- */
-    div[data-testid="stBottom"] {{
-        background-color: transparent !important;
-        border: none !important;
-        padding-bottom: 20px !important; /* Lifts the input box */
-    }}
-    /* --- END FIX --- */
+    /* --- MORE AGGRESSIVE FIX for the black bar --- */
+    div[data-testid="stBottom"] > div {
+        background: transparent;
+    }
 
     /* --- INPUT STYLES START --- */
     
     /* Style the main chat input box (at the bottom) */
-    [data-testid="stChatInput"] {{
+    [data-testid="stChatInput"] {
         background-color: rgba(0, 0, 0, 0.2); /* More transparent */
         backdrop-filter: blur(12px);
         border-radius: 50px; /* Pill shape */
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }}
+    }
 
     /* Add a glow effect when the chat input is focused */
-    [data-testid="stChatInput"]:focus-within {{
+    [data-testid="stChatInput"]:focus-within {
         border-color: rgba(173, 216, 230, 0.7); /* Light blue glow */
         box-shadow: 0 0 10px rgba(173, 216, 230, 0.3);
-    }}
+    }
     
     /* Styling for the placeholder text in the main chat input */
-    [data-testid="stChatInput"] textarea::placeholder {{
+    [data-testid="stChatInput"] textarea::placeholder {
         color: rgba(255, 255, 255, 0.6);
         font-family: 'Poppins', sans-serif;
-    }}
+    }
 
     /* --- NEW SEND BUTTON STYLES --- */
-    [data-testid="stChatInput"] button {{
+    [data-testid="stChatInput"] button {
         background-color: #333;
         border: none;
         border-radius: 50%;
@@ -112,29 +109,29 @@ def set_gemini_background():
         align-items: center;
         transition: background-color 0.3s ease;
         margin: 5px;
-    }}
+    }
 
-    [data-testid="stChatInput"] button:hover {{
+    [data-testid="stChatInput"] button:hover {
         background-color: #444;
-    }}
+    }
 
-    [data-testid="stChatInput"] button svg {{
+    [data-testid="stChatInput"] button svg {
         display: none; /* Hide default SVG */
-    }}
+    }
 
-    [data-testid="stChatInput"] button::after {{
+    [data-testid="stChatInput"] button::after {
         content: '➤';
         font-size: 18px;
         color: white;
         transform: rotate(0deg);
         line-height: 1;
-    }}
+    }
     
     /* --- INPUT STYLES END --- */
 
 
     /* Style the chat messages with animation */
-    [data-testid="stChatMessage"] {{
+    [data-testid="stChatMessage"] {
         background-color: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(10px);
         border-radius: 12px;
@@ -142,26 +139,26 @@ def set_gemini_background():
         border: 1px solid rgba(255, 255, 255, 0.05);
         animation: fadeIn 0.5s ease-out; /* Apply the fade-in animation */
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
-    }}
+    }
 
     /* Centered container for the initial 'Hello' message */
-    .initial-view-container {{
+    .initial-view-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 80vh; /* Make it take up more vertical space */
-    }}
+    }
     
     /* --- UPDATED HELLO TEXT STYLE --- */
-    .hello-text {{
+    .hello-text {
         font-family: 'Poppins', sans-serif !important;
         font-size: 4.0em !important; /* Reduced size */
         font-weight: 600 !important; /* Bolder */
         color: #f0f0f0 !important;
         padding-bottom: 20px !important;
         letter-spacing: -2px !important; /* Tighter spacing */
-    }}
+    }
     
     </style>
     """
@@ -213,7 +210,7 @@ def main():
             st.markdown(message["content"])
 
     # --- Unified Chat Input and Response Logic ---
-    if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
+    if prompt := st.chat_input("Ask Gemini"):
         # Add user message to session state and display it immediately
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user", avatar=USER_AVATAR):
