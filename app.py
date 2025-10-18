@@ -3,47 +3,29 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
-import base64
 
-# Load environment variables from a.env file at the start
+# Load environment variables from a .env file at the start
 load_dotenv()
 
-# Suppress the gRPC warning which is common in some environments
-os.environ = 'NONE'
+# Suppress the gRPC warning
+os.environ['GRPC_VERBOSITY'] = 'NONE'
 
-def set_ui_styles(is_initial_state):
+def set_gemini_background():
     """
-    Injects CSS into the Streamlit app.
-    It conditionally applies styles for the initial centered view vs. the active chat view.
+    Sets a "liquid glass" themed animated background and UI styles for the Streamlit app.
+    This version fixes scrolling, input box positioning, and adds a clickable header.
     """
-    # LinkedIn logo SVG from Bootstrap Icons (MIT License)
-    # Source: https://icons.getbootstrap.com/icons/linkedin/
-    linkedin_svg_path = """
-    M0 1.146C0.513.526 0 1.175 0h13.65C15.474 0 16.513 16 1.146v13.708c0.633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zM4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.518-.681 1.518-1.518S4.58 3.65 3.743 3.65s-1.518.68-1.518 1.518.681 1.518 1.518 1.518zm1.2 8.212h3.553V9.25c0-.926.016-2.116 1.29-2.116 1.291 0 1.488 1.003 1.488 2.049v4.468h3.554V9.019c0-3.22-1.714-5.025-4.287-5.025-2.049 0-3.134 1.084-3.658 2.115h.055V6.169H4.943z
+    # LinkedIn SVG Icon - corrected and styled
+    linkedin_svg = """
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="linkedin-icon">
+      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+    </svg>
     """
-    
-    # Conditional CSS for the chat input position
-    # If it's the initial state, we center the input box. Otherwise, it stays at the bottom.
-    conditional_input_style = ""
-    if is_initial_state:
-        conditional_input_style = """
-        /* Center the input box in the initial view */
-        {
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            transform: translate(-50%, 90%); /* Adjust vertical alignment */
-            width: 80%!important;
-            max-width: 740px!important;
-        }
-        """
-    
-    # The main CSS block for the application
-    page_styles = f"""
+
+    page_bg_img = f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-    /* --- KEYFRAMES FOR ANIMATIONS --- */
     @keyframes morph {{
         0% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1.2); }}
         50% {{ border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.1); }}
@@ -51,24 +33,24 @@ def set_ui_styles(is_initial_state):
     }}
     
     @keyframes fadeIn {{
-        from {{ opacity: 0; transform: translateY(15px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
+        from {{
+            opacity: 0;
+            transform: translateY(15px);
+        }}
+        to {{
+            opacity: 1;
+            transform: translateY(0);
+        }}
     }}
 
-    /* --- GLOBAL & LAYOUT STYLES --- */
-    body {{
-        font-family: 'Poppins', sans-serif;
-    }}
-
-    /* Main app container styling - Flexbox layout for scrolling */
+    /* Main app container styling */
     [data-testid="stAppViewContainer"] {{
-        background-color: #111827;
+        background-color: #111827; /* Dark gray base */
         position: relative;
-        overflow: hidden; /* Keep this for the blob effect, but manage children overflow */
         color: #e0e0e0;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
+        font-family: 'Poppins', sans-serif;
+        /* CRITICAL FIX: Ensure the container itself doesn't hide overflow */
+        overflow: hidden; 
     }}
 
     /* Pseudo-element for the animated blob */
@@ -85,62 +67,62 @@ def set_ui_styles(is_initial_state):
         z-index: 0;
     }}
     
-    /* Ensure content is above the background animation */
-   .main {{
-        z-index: 1;
+    /* Ensure all content is above the background animation */
+    /* Use a class for the main layout to avoid affecting other elements */
+    .main-content-wrapper {{
         position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh; /* Make the wrapper take full viewport height */
     }}
     
-    /* This targets the main content area and makes it scrollable */
-    [data-testid="stAppViewContainer"] > section > div > div > div > div:nth-child(1) {{
-        flex-grow: 1;
-        overflow-y: auto; /* THIS IS THE KEY FIX FOR SCROLLING */
-        padding-right: 15px; /* Add some padding to avoid scrollbar overlap */
-    }}
-
     /* Hide the default Streamlit header */
     [data-testid="stHeader"] {{
         background-color: rgba(0, 0, 0, 0);
-        z-index: 10;
+        z-index: 101; /* Ensure header is above content */
     }}
 
-    /* Style the bottom section containing the chat input */
-    section {{
-        background-color: transparent!important;
-        border: none!important;
-        padding-bottom: 15px!important;
-        padding-top: 10px!important;
-        z-index: 10;
-        width: 100%;
+    /* --- CHAT AREA SCROLLING FIX --- */
+    /* Target the container that holds the chat messages */
+    .st-emotion-cache-1jicfl2 {{
+        flex-grow: 1; /* Allow this container to grow and fill available space */
+        overflow-y: auto; /* Enable vertical scrolling for the chat area */
+        padding-bottom: 20px; /* Add some space at the bottom */
     }}
 
-    /* --- INITIAL VIEW STYLES (NO MESSAGES) --- */
-   .initial-view-container {{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        text-align: center;
+    /* Custom scrollbar for a cleaner look */
+    .st-emotion-cache-1jicfl2::-webkit-scrollbar {{
+        width: 6px;
     }}
-    
-   .hello-text {{
-        font-family: 'Poppins', sans-serif!important;
-        font-size: 4.0em!important;
-        font-weight: 600!important;
-        color: #f0f0f0!important;
-        letter-spacing: -2px!important;
-        animation: fadeIn 1s ease-out;
+    .st-emotion-cache-1jicfl2::-webkit-scrollbar-track {{
+        background: rgba(0,0,0,0.1);
+        border-radius: 10px;
+    }}
+    .st-emotion-cache-1jicfl2::-webkit-scrollbar-thumb {{
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+    }}
+    .st-emotion-cache-1jicfl2::-webkit-scrollbar-thumb:hover {{
+        background: rgba(255,255,255,0.3);
     }}
 
     /* --- CHAT INPUT STYLES --- */
+    /* This section remains largely the same, but it will now be correctly positioned at the bottom */
+    section[data-testid="stBottom"] {{
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0 1rem 1rem 1rem; /* Adjust padding */
+        z-index: 2; /* Keep input on top */
+    }}
+
+    /* Style the pill-shaped chat input box */
     [data-testid="stChatInput"] {{
         background-color: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(12px);
-        border-radius: 9999px; /* Perfect pill shape */
+        border-radius: 50px; /* Pill shape */
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        padding: 5px 5px 5px 15px;
     }}
 
     [data-testid="stChatInput"]:focus-within {{
@@ -148,43 +130,22 @@ def set_ui_styles(is_initial_state):
         box-shadow: 0 0 10px rgba(173, 216, 230, 0.3);
     }}
     
-    [data-testid="stChatInput"] textarea {{
-        background-color: transparent;
-        color: #e0e0e0;
-        font-family: 'Poppins', sans-serif;
-    }}
-
     [data-testid="stChatInput"] textarea::placeholder {{
         color: rgba(255, 255, 255, 0.6);
         font-family: 'Poppins', sans-serif;
     }}
-
+    
     [data-testid="stChatInput"] button {{
-        background-color: #333;
-        border: none;
-        border-radius: 50%;
-        width: 38px;
-        height: 38px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: background-color 0.3s ease;
-        margin: 0;
+        background-color: #333; border: none; border-radius: 50%;
+        width: 36px; height: 36px; display: flex;
+        justify-content: center; align-items: center;
+        transition: background-color 0.3s ease; margin: 5px;
     }}
-
-    [data-testid="stChatInput"] button:hover {{
-        background-color: #444;
-    }}
-
-    [data-testid="stChatInput"] button svg {{
-        display: none; /* Hide default SVG */
-    }}
-
+    [data-testid="stChatInput"] button:hover {{ background-color: #444; }}
+    [data-testid="stChatInput"] button svg {{ display: none; }}
     [data-testid="stChatInput"] button::after {{
-        content: '➤';
-        font-size: 18px;
-        color: white;
-        line-height: 1;
+        content: '➤'; font-size: 18px; color: white;
+        transform: rotate(0deg); line-height: 1;
     }}
     
     /* --- CHAT MESSAGE STYLES --- */
@@ -196,59 +157,67 @@ def set_ui_styles(is_initial_state):
         border: 1px solid rgba(255, 255, 255, 0.05);
         animation: fadeIn 0.5s ease-out;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        width: fit-content;
-        max-width: 85%;
     }}
 
-    /* --- HEADER MARK STYLES --- */
-   .header-mark {{
+    /* --- INITIAL VIEW STYLING --- */
+    .initial-view-container {{
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Center vertically in its container */
+        align-items: center;
+        flex-grow: 1; /* Allow it to take up all available space */
+        text-align: center;
+    }}
+    
+    .hello-text {{
+        font-family: 'Poppins', sans-serif !important;
+        font-size: 3.5em !important;
+        font-weight: 600 !important;
+        color: #f0f0f0 !important;
+        padding-bottom: 20px !important;
+        letter-spacing: -2px !important;
+    }}
+    
+    /* --- HEADER MARK WITH CLICKABLE LOGO --- */
+    .header-mark {{
         position: fixed;
-        top: 20px;
-        left: 25px;
-        z-index: 100;
-    }}
-
-   .header-mark a {{
+        top: 25px;
+        left: 30px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px; /* Space between name and icon */
         font-size: 0.9em;
         font-weight: 400;
         color: rgba(255, 255, 255, 0.7);
-        text-decoration: none;
-        transition: color 0.3s ease;
+        z-index: 100;
     }}
-
-   .header-mark a:hover {{
+    .header-mark a {{
+        display: inline-block;
+        line-height: 0; /* Align icon properly */
+        transition: transform 0.2s ease-in-out;
+    }}
+    .header-mark a:hover {{
+        transform: scale(1.1);
+    }}
+    .linkedin-icon {{
+        width: 20px;
+        height: 20px;
+        color: rgba(255, 255, 255, 0.7);
+    }}
+    .linkedin-icon:hover {{
         color: rgba(255, 255, 255, 1.0);
     }}
-
-   .header-mark svg {{
-        width: 16px;
-        height: 16px;
-        fill: currentColor; /* The SVG color will match the text color */
-    }}
-
-    /* Apply the conditional style for the input box */
-    {conditional_input_style}
-
     </style>
-    """
     
-    # HTML for the header mark
-    header_html = f"""
+    <!-- Header Mark HTML with clickable link -->
     <div class="header-mark">
+        <span>Developed by Shubham Yadav</span>
         <a href="https://www.linkedin.com/in/shubham-yadav-ds/" target="_blank" rel="noopener noreferrer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16">
-                <path d="{linkedin_svg_path}"/>
-            </svg>
-            <span>Developed by Shubham Yadav</span>
+            {linkedin_svg}
         </a>
     </div>
     """
-    
-    st.markdown(page_styles, unsafe_allow_html=True)
-    st.markdown(header_html, unsafe_allow_html=True)
+    st.markdown(page_bg_img, unsafe_allow_html=True)
 
 def main():
     """
@@ -261,74 +230,85 @@ def main():
         layout="centered"
     )
 
-    # --- Session State Initialization ---
-    if "messages" not in st.session_state:
-        st.session_state.messages = # <<< THIS LINE IS NOW CORRECTED
+    set_gemini_background()
 
-    # --- UI Styling ---
-    # The key change: pass the state to the styling function
-    set_ui_styles(is_initial_state=(not st.session_state.messages))
-
-    # --- AVATAR ICONS (using Base64 for self-containment) ---
+    # --- AVATAR ICONS ---
     USER_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2YwZjBmMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0yMzAuOTIsMjEyYy0xNS4yMy0yNi4zMy0zOC43LTQ1LjIxLTY2LjA5LTU0LjE2YTcyLDcyLDAsMSwwLTczLjY2LDBDNjMuNzgsMTY2Ljc4LDQwLjMxLDE4NS42NiwyNS4wOCwyMTJhOCw4LDAsMSwwLDEzLjg0LDhjMTguODQtMzIuNTYsNTIuMTQtNTIsODkuMDgtNTJzNzAuMjQsMTkuNDQsODkuMDgsNTJhOCw4LDAsMSwwLDEzLjg0LThaIj48L3BhdGg+PC9zdmc+"
     ASSISTANT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2YwZjBmMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0yMDgsMzJINDhBMTYsMTYsMCwwLDAsMzIsNDhWMTc2YTE2LDE2LDAsMCwwLDE2LDE2SDY0djI0YTgsOCwwLDAsMCwxNiwwVjE5Mmg5NnYyNGE4LDgsMCwwLDAsMTYsMFYxOTJoMTZhMTYsMTYsMCwwLDAsMTYtMTZWNDhBMTYsMTYsMCwwLDAsMjA4LDMyWk05NiwxNDRhMTYsMTYsMCwxLDEsMTYtMTZBMTYsMTYsMCwwLDEsOTYsMTQ0Wm02NCwwYTE2LDE2LDAsMSwxLDE2LTE2QTE2LDE2LDAsMCwxLDE2MCwxNDRaIj48L3BhdGg+PC9zdmc+"
 
     # --- Model Initialization ---
     try:
-        model = ChatGoogleGenerativeAI(model='gemini-1.5-flash', stream=True)
+        model = ChatGoogleGenerativeAI(model='models/gemini-1.5-flash', stream=True)
     except Exception as e:
-        st.error("Failed to initialize the Gemini model. Please check your API key.")
+        st.error(f"Failed to initialize the Gemini model. Please check your API key.")
         st.error(f"Error details: {e}")
         return
 
-    # --- UI Logic ---
-    # Show the initial centered greeting if there are no messages
-    if not st.session_state.messages:
-        st.markdown("""
-            <div class="initial-view-container">
-                <p class="hello-text">Hello there!</p>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    # Display the entire chat history from session state
-    for message in st.session_state.messages:
-        avatar = USER_AVATAR if message["role"] == "user" else ASSISTANT_AVATAR
-        with st.chat_message(message["role"], avatar=avatar):
-            st.markdown(message["content"])
+    # --- Session State for Chat History ---
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-    # --- Unified Chat Input and Response Logic ---
-    if prompt := st.chat_input("Ask Gemini...", key="main_chat_input"):
-        # Add user message to session state
+    # --- UI LAYOUT ---
+    # Apply a wrapper div to control the main layout with flexbox
+    st.markdown('<div class="main-content-wrapper">', unsafe_allow_html=True)
+
+    # Use a container for the chat history to enable scrolling
+    chat_container = st.container()
+
+    with chat_container:
+        # Show the initial centered greeting if there are no messages
+        if not st.session_state.messages:
+            st.markdown("""
+                <div class="initial-view-container">
+                    <p class="hello-text">Hello there!</p>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            # Display the entire chat history from session state
+            for message in st.session_state.messages:
+                avatar = USER_AVATAR if message["role"] == "user" else ASSISTANT_AVATAR
+                with st.chat_message(message["role"], avatar=avatar):
+                    st.markdown(message["content"])
+
+    # --- UNIFIED CHAT INPUT AND RESPONSE LOGIC ---
+    if prompt := st.chat_input("Ask Gemini", key="main_chat_input"):
+        # Add user message to session state and display it
         st.session_state.messages.append({"role": "user", "content": prompt})
         
-        # Immediately re-run the script to update the UI.
-        # This removes the initial view and moves the input to the bottom.
+        # Display the new user message inside the chat container
+        with chat_container:
+            with st.chat_message("user", avatar=USER_AVATAR):
+                st.markdown(prompt)
+
+        # Generate and stream AI response
+        with chat_container:
+            with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
+                try:
+                    history = st.session_state.messages[-10:]
+                    langchain_messages = [
+                        HumanMessage(content=msg["content"]) if msg["role"] == "user" 
+                        else AIMessage(content=msg["content"]) 
+                        for msg in history
+                    ]
+                    config = {"generation_config": {"response_mime_type": "text/plain"}}
+                    
+                    def stream_response():
+                        for chunk in model.stream(langchain_messages, config=config):
+                            yield chunk.content
+                    
+                    full_response = st.write_stream(stream_response)
+                    
+                    # Add the complete AI response to session state for history
+                    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+                except Exception as e:
+                    st.error(f"An error occurred while getting the response: {e}")
+        
+        # Rerun to clear the "Hello there!" and display the full chat
         st.rerun()
 
-    # The logic to generate a response only runs if the last message was from the user
-    # and we need to generate a new assistant response.
-    if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
-        with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
-            try:
-                # Prepare history for the model
-                history = st.session_state.messages
-                langchain_messages = [
-                    HumanMessage(content=msg["content"]) if msg["role"] == "user" 
-                    else AIMessage(content=msg["content"]) 
-                    for msg in history
-                ]
-                
-                def stream_response():
-                    for chunk in model.stream(langchain_messages):
-                        yield chunk.content
-                
-                full_response = st.write_stream(stream_response)
-                
-                # Add the complete AI response to session state for history
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-            except Exception as e:
-                st.error(f"An error occurred while getting the response: {e}")
+    # Close the wrapper div
+    st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     if os.getenv("GOOGLE_API_KEY") is None:
