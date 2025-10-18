@@ -14,7 +14,7 @@ os.environ['GRPC_VERBOSITY'] = 'NONE'
 def set_gemini_background():
     """
     Sets a "liquid glass" themed animated background and UI styles for the Streamlit app.
-    This final version fixes the initial layout, input box visibility, and header icon glitch.
+    This version fixes the LinkedIn hyperlink so both text and icon are clickable.
     """
     st.markdown(f"""
     <style>
@@ -127,7 +127,10 @@ def set_gemini_background():
     .header-mark a {{
         display: inline-flex;
         align-items: center;
+        gap: 8px;
         transition: transform 0.2s ease-in-out;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
     }}
     .header-mark a:hover {{
         transform: scale(1.1);
@@ -135,14 +138,14 @@ def set_gemini_background():
     .header-mark a img {{
         width: 20px;
         height: 20px;
-        filter: invert(1); /* white icon */
+        filter: invert(1);
     }}
     </style>
 
-    <!-- Fixed Header HTML (working LinkedIn link) -->
+    <!-- Fixed Header HTML with unified clickable LinkedIn link -->
     <div class="header-mark">
-        <span>Developed by Shubham Yadav</span>
         <a href="https://www.linkedin.com/in/shubham-yadav-ds/" target="_blank" rel="noopener noreferrer" title="LinkedIn Profile">
+            <span>Developed by Shubham Yadav</span>
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" />
         </a>
     </div>
