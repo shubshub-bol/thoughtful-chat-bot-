@@ -65,6 +65,14 @@ Try it live here \
 | Desktop View | Mobile View |
 | ------------ | ----------- |
 |              |             |
+<img width="1895" height="1057" alt="desktop-view png" src="https://github.com/user-attachments/assets/d0620fc4-b570-4c7f-b1da-7dcc319b298b" />
+
+<img width="195" height="1257" alt="mobile-view png" src="https://github.com/user-attachments/assets/4ee2799f-3af2-4699-ac5b-b27f17da50a5" />
+
+
+
+            
+
 
 ---
 
